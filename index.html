@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro Timer with To-Do List</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Global Styling */
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #222; /* Black background for the body */
+        color: white;
+        font-family: Arial, sans-serif;
+      }
+
+      /* Container Styling */
+      .container {
+        margin-bottom: 20px;
+        margin-top: 20px;
+        text-align: center;
+        padding: 20px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #333, #444);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+        animation: fadeIn 2s ease-in-out, pulseBackground 5s infinite alternate;
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .container:hover {
+        transform: scale(1.05);
+      }
+
+      /* Timer Section */
+      .timer {
+        font-size: 48px;
+        margin-bottom: 20px;
+      }
+
+      /* Form Elements */
+      select,
+      button,
+      input {
+        margin: 5px;
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+      }
+
+      /* Buttons */
+      button {
+        background-color: #444;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        padding: 10px 15px;
+        margin: 5px;
+        border-radius: 5px;
+        border: none;
+        font-size: 14px; /* Adjusted font size */
+        width: 45%; /* Ensure buttons fit side by side */
+      }
+
+      button:hover {
+        background-color: #666;
+        transform: translateY(-3px);
+      }
+
+      button#reset-btn {
+        background-color: #dc3545;
+      }
+
+      #add-todo-btn {
+        padding: 5px 10px;
+        background-color: #007bff;
+        display: inline-block;
+      }
+
+      /* To-Do List */
+      /* Container for the to-do list */
+      .todo-container {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* Input for adding new tasks */
+      #todo-input {
+        padding: 10px;
+        margin-bottom: 10px;
+        width: 250px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      /* Add task button */
+      #add-todo-btn {
+        padding: 10px 15px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      #add-todo-btn:hover {
+        background-color: #45a049;
+      }
+
+      /* To-do list styles */
+      #todo-list {
+        list-style-type: none;
+        padding: 0;
+        width: 100%;
+        max-width: 300px;
+        margin-top: 20px;
+      }
+
+      /* Style for each list item */
+      #todo-list li {
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f9f9f9;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s;
+      }
+
+      #todo-list li:hover {
+        background-color: #e6f7e6;
+      }
+
+      /* Completed task styling */
+      #todo-list li.completed {
+        text-decoration: line-through;
+        background-color: #d3ffd3;
+      }
+
+      #todo-list li.completed span {
+        color: #6c757d; /* Dull color for completed tasks */
+      }
+
+      #todo-list li.completed button {
+        background-color: #6c757d; /* Disabled button color */
+        cursor: not-allowed;
+      }
+
+      /* Button styling */
+      #todo-list button {
+        padding: 5px 10px;
+        font-size: 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+      }
+
+      #todo-list button:hover {
+        transform: translateY(-2px);
+      }
+
+      /* Complete button (Green) */
+      #todo-list li button.complete-btn {
+        background-color: #28a745;
+      }
+
+      #todo-list li button.complete-btn:hover {
+        background-color: #218838;
+      }
+
+      /* Remove button (Red) */
+      #todo-list li button.remove-btn {
+        background-color: #dc3545;
+      }
+
+      #todo-list li button.remove-btn:hover {
+        background-color: #c82333;
+      }
+
+      /* Style for task description */
+      #todo-list li span {
+        color: #222;
+        margin-right: 10px;
+        word-wrap: break-word;
+      }
+
+      /* Focused state for buttons (Accessibility) */
+      #todo-list button:focus {
+        outline: 2px solid #007bff; /* Blue outline on focus for accessibility */
+      }
+
+      #pause-btn {
+        background-color: #ffc107; /* Yellow for pause */
+        color: black;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        padding: 10px 15px;
+        margin: 5px;
+        border-radius: 5px;
+        border: none;
+        font-size: 14px;
+      }
+
+      #pause-btn:hover {
+        background-color: #ffdd57;
+        transform: translateY(-3px);
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulseBackground {
+        from {
+          background: linear-gradient(135deg, #333, #555);
+        }
+        to {
+          background: linear-gradient(135deg, #444, #666);
+        }
+      }
+
+      /* Typography */
+      h1,
+      h2 {
+        margin-bottom: 20px;
+        font-size: 1.5rem; /* Adjusted for better readability */
+      }
+
+      /* Media Queries */
+      @media (max-width: 500px) {
+        .container {
+          padding: 15px;
+        }
+
+        h1,
+        h2 {
+          font-size: 1.2rem;
+        }
+
+        .timer {
+          font-size: 36px; /* Reduced size for smaller screens */
+        }
+
+        button {
+          font-size: 12px; /* Smaller button text */
+          padding: 8px 10px;
+        }
+
+        select {
+          font-size: 12px;
+          width: 100%;
+        }
+
+        #todo-input {
+          width: calc(100% - 60px); /* Adjust for smaller screens */
+        }
+
+        #todo-list li {
+          font-size: 0.8rem; /* Adjusted for smaller screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Pomodoro Timer</h1>
+
+      <!-- User selects the timer duration -->
+      <label for="timer-duration">Select Timer Duration:</label>
+      <select id="timer-duration">
+        <option value="5">5 minutes</option>
+        <option value="10">10 minutes</option>
+        <option value="15">15 minutes</option>
+        <option value="20">20 minutes</option>
+      </select>
+
+      <div class="timer">
+        <span id="minutes">20</span>:<span id="seconds">00</span>
+      </div>
+      <button id="start-btn">Start</button>
+      <button id="pause-btn">Pause</button>
+      <button id="reset-btn">Reset</button>
+
+      <!-- Button to stop the sound after time ends -->
+      <button id="stop-sound-btn" style="display: none">Stop Sound</button>
+
+      <h2>To-Do List</h2>
+      <div class="todo-container">
+        <input type="text" id="todo-input" placeholder="Add a new task" />
+        <button id="add-todo-btn">Add</button>
+        <ul id="todo-list"></ul>
+      </div>
+    </div>
+    <div style="text-align: center; margin: 20px 0">
+      <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      ></script>
+      <ins
+        class="adsbygoogle"
+        style="display: block"
+        data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+        data-ad-slot="XXXXXXXXXX"
+        data-ad-format="auto"
+      ></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <script>
+      let timerInterval;
+      let timeLeft;
+
+      const startBtn = document.getElementById("start-btn");
+      const resetBtn = document.getElementById("reset-btn");
+      const minutesDisplay = document.getElementById("minutes");
+      const secondsDisplay = document.getElementById("seconds");
+      const todoInput = document.getElementById("todo-input");
+      const addTodoBtn = document.getElementById("add-todo-btn");
+      const todoList = document.getElementById("todo-list");
+      const stopSoundBtn = document.getElementById("stop-sound-btn");
+      const pauseBtn = document.getElementById("pause-btn");
+      const timerDuration = document.getElementById("timer-duration");
+
+      const alarmSound = new Audio("./audio/siren-alert-96052.mp3");
+
+      startBtn.addEventListener("click", startTimer);
+      resetBtn.addEventListener("click", resetTimer);
+      addTodoBtn.addEventListener("click", addTodo);
+      stopSoundBtn.addEventListener("click", stopSound);
+
+      stopSoundBtn.style.display = "none";
+
+      // Add an event listener for the onchange event on the select element
+      timerDuration.addEventListener("change", updateSelectedTime);
+
+      function updateSelectedTime() {
+        const selectedTime = timerDuration.value;
+        if (selectedTime <= 0) {
+          alert("Please select a valid time.");
+          return;
+        }
+        timeLeft = selectedTime * 60;
+        updateDisplay();
+        saveTimerState();
+        alert(`Timer updated to ${selectedTime} minutes.`);
+      }
+
+      // Load data on page load
+      window.addEventListener("DOMContentLoaded", () => {
+        loadTimerState();
+        loadTodoList();
+        updateDisplay();
+      });
+
+      function startTimer() {
+        const selectedTime = document.getElementById("timer-duration").value;
+
+        if (!timerInterval && timeLeft === 0) {
+          timeLeft = selectedTime * 60;
+        }
+
+        if (!timerInterval) {
+          timerInterval = setInterval(() => {
+            if (timeLeft > 0) {
+              timeLeft--;
+              updateDisplay();
+              saveTimerState(); // Save timer progress
+            } else {
+              clearInterval(timerInterval);
+              timerInterval = null;
+              alarmSound.play();
+              showStopButton(); // Show the stop sound button when time is up
+            }
+          }, 1000);
+        }
+      }
+
+      function resetTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        const selectedTime = document.getElementById("timer-duration").value;
+        timeLeft = selectedTime * 60;
+        updateDisplay();
+        saveTimerState();
+        hideStopButton();
+      }
+
+      function updateDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        minutesDisplay.textContent = String(minutes).padStart(2, "0");
+        secondsDisplay.textContent = String(seconds).padStart(2, "0");
+      }
+
+      function addTodo() {
+        const taskText = todoInput.value.trim();
+        if (taskText !== "") {
+          const listItem = createTodoItem(taskText, false);
+          todoList.appendChild(listItem);
+          todoInput.value = "";
+          saveTodoList();
+        }
+      }
+
+      function createTodoItem(text, completed) {
+        const listItem = document.createElement("li");
+
+        // Create the task text span
+        const taskSpan = document.createElement("span");
+        taskSpan.textContent = text;
+        listItem.appendChild(taskSpan);
+
+        // Add a "complete" button
+        const completeBtn = document.createElement("button");
+        completeBtn.textContent = "Complete";
+        completeBtn.addEventListener("click", () => {
+          listItem.classList.toggle("completed");
+          saveTodoList();
+        });
+
+        // Add a "remove" button
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "Remove";
+        removeBtn.addEventListener("click", () => {
+          todoList.removeChild(listItem);
+          saveTodoList();
+        });
+
+        if (completed) {
+          listItem.classList.add("completed");
+        }
+
+        listItem.appendChild(completeBtn);
+        listItem.appendChild(removeBtn);
+        return listItem;
+      }
+
+      function showStopButton() {
+        stopSoundBtn.style.display = "inline-block"; // Show stop sound button when time ends
+      }
+
+      function hideStopButton() {
+        stopSoundBtn.style.display = "none"; // Hide stop sound button when timer is reset
+      }
+
+      function stopSound() {
+        alarmSound.pause(); // Stop the sound
+        alarmSound.currentTime = 0; // Reset the sound to the start
+        hideStopButton(); // Hide the button after stopping the sound
+      }
+
+      // Save timer state to localStorage
+      function saveTimerState() {
+        localStorage.setItem("timerState", JSON.stringify({ timeLeft }));
+      }
+
+      // Load timer state from localStorage
+      function loadTimerState() {
+        const savedState = JSON.parse(localStorage.getItem("timerState"));
+        timeLeft = savedState?.timeLeft || 0; // Default to 0 if no saved state
+      }
+
+      // Save to-do list to localStorage
+      function saveTodoList() {
+        const todos = Array.from(todoList.children).map((item) => ({
+          text: item.querySelector("span").textContent,
+          completed: item.classList.contains("completed"),
+        }));
+        localStorage.setItem("todoList", JSON.stringify(todos));
+      }
+
+      // Load to-do list from localStorage
+      function loadTodoList() {
+        const savedTodos = JSON.parse(localStorage.getItem("todoList"));
+        if (savedTodos) {
+          savedTodos.forEach((todo) => {
+            const listItem = createTodoItem(todo.text, todo.completed);
+            todoList.appendChild(listItem);
+          });
+        }
+      }
+
+      //pause button
+      pauseBtn.addEventListener("click", pauseTimer);
+
+      function pauseTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    </script>
+  </body>
+</html>
