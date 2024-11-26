@@ -280,13 +280,13 @@
         }
       }
     </style>
-  </head>
-  <body>
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4900519888166581"
       crossorigin="anonymous"
     ></script>
+  </head>
+  <body>
     <div class="container">
       <h1>Pomodoro Timer</h1>
 
@@ -319,7 +319,7 @@
     <div style="text-align: center; margin: 20px 0">
       <script
         async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4900519888166581"
       ></script>
       <ins
         class="adsbygoogle"
@@ -388,12 +388,12 @@
             if (timeLeft > 0) {
               timeLeft--;
               updateDisplay();
-              saveTimerState(); // Save timer progress
+              saveTimerState();
             } else {
               clearInterval(timerInterval);
               timerInterval = null;
               alarmSound.play();
-              showStopButton(); // Show the stop sound button when time is up
+              showStopButton();
             }
           }, 1000);
         }
